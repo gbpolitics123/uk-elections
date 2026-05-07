@@ -1,1 +1,284 @@
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+html, body { height: 100%; }
+
+.er-outer {
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  width: 100vw;
+  max-width: 100vw;
+}
+
+.er-widget {
+  font-family: 'DM Sans', sans-serif;
+  background: #0d1117;
+  color: #ffffff;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.er-header {
+  background: #111820;
+  padding: 22px 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #21303f;
+  flex-shrink: 0;
+}
+.er-title { font-family: 'DM Sans', sans-serif; font-size: 1.6rem; font-weight: 700; color: #ffffff; letter-spacing: -0.01em; }
+.er-title span { color: #e2a930; }
+.er-live-badge { display: flex; align-items: center; gap: 7px; background: #da3633; color: #fff; padding: 6px 14px; border-radius: 5px; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+.er-live-dot { width: 7px; height: 7px; background: #fff; border-radius: 50%; animation: er-blink 1.4s infinite; }
+@keyframes er-blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+.er-tabs-nav { display: flex; background: #111820; border-bottom: 1px solid #21303f; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; touch-action: pan-x; flex-shrink: 0; }
+.er-tabs-nav::-webkit-scrollbar { display: none; }
+.er-tab-btn { flex: 1; min-width: 130px; padding: 16px 18px; background: none; border: none; border-bottom: 3px solid transparent; color: #8a9ab0; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: color 0.18s, border-color 0.18s, background 0.18s; text-align: center; white-space: nowrap; -webkit-tap-highlight-color: transparent; }
+.er-tab-btn:hover { color: #ffffff; background: rgba(255,255,255,0.04); }
+.er-tab-btn.er-active { color: #ffffff; border-bottom-color: #e2a930; }
+#erPanels { display: flex; flex-direction: column; flex: 1; }
+.er-panel { display: none; padding: 32px 36px 40px; flex: 1; flex-direction: column; }
+.er-panel.er-active { display: flex; }
+.er-progress-box { background: #161d26; border: 1px solid #21303f; border-radius: 10px; padding: 22px 28px; margin-bottom: 30px; }
+.er-progress-row { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 14px; }
+.er-progress-label { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: #8a9ab0; }
+.er-progress-pct-wrap { text-align: right; }
+.er-progress-pct { font-family: 'DM Sans', sans-serif; font-size: 2.4rem; font-weight: 700; color: #ffffff; line-height: 1; }
+.er-progress-sub { font-family: 'DM Sans', sans-serif; font-size: 0.82rem; color: #8a9ab0; margin-top: 4px; }
+.er-progress-track { height: 9px; background: #21303f; border-radius: 5px; overflow: hidden; }
+.er-progress-fill { height: 100%; background: linear-gradient(90deg, #e2a930 0%, #e4003b 100%); border-radius: 5px; transition: width 1s ease; }
+.er-section-label { font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: #8a9ab0; margin-bottom: 14px; margin-top: 28px; }
+.er-parties-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.er-party-card { background: #161d26; border: 1px solid #21303f; border-radius: 10px; padding: 16px 18px; border-left: 5px solid; }
+.er-party-name { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #ffffff; margin-bottom: 11px; }
+.er-party-row { display: flex; gap: 8px; align-items: center; }
+.er-badge { font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 700; padding: 4px 10px; border-radius: 5px; min-width: 40px; text-align: center; }
+.er-badge-gain  { background: rgba(35,134,54,0.2);  color: #3fb950; }
+.er-badge-loss  { background: rgba(218,54,51,0.2);  color: #f85149; }
+.er-badge-zero  { background: rgba(138,154,176,0.12); color: #8a9ab0; }
+.er-loading, .er-error { padding: 60px; text-align: center; font-size: 0.95rem; color: #8a9ab0; flex: 1; display: flex; align-items: center; justify-content: center; }
+.er-error { color: #f85149; }
+.er-footer { background: #111820; border-top: 1px solid #21303f; padding: 13px 36px; display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: #4a5568; flex-shrink: 0; margin-top: auto; }
+@media (max-width: 600px) {
+  .er-header { padding: 16px 18px; }
+  .er-title  { font-size: 1.1rem; }
+  .er-panel  { padding: 20px 16px 32px; }
+  .er-footer { padding: 10px 18px; }
+  .er-parties-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+}
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<div class="er-outer">
+  <div class="er-widget">
+    <div class="er-header">
+      <div class="er-title">🗳 UK Elections <span>2026</span> – Live Results</div>
+      <div class="er-live-badge"><div class="er-live-dot"></div>Live</div>
+    </div>
+    <div class="er-tabs-nav" id="erTabsNav"></div>
+    <div id="erPanels"></div>
+    <div class="er-footer">
+      <span>Refreshes every 60 seconds</span>
+      <span id="erLastUpdated">—</span>
+    </div>
+  </div>
+</div>
+
+<script>
+var SHEET_ID = '1pqObzBVhI2vW1lijyoPvsUQzvG28-bz0qqUBRnPsUnA';
+
+var ELECTIONS = [
+  { key: 'local',    label: 'Locals (ENG)', sheet: 'LocalGov', defaultParties: [] },
+  { key: 'holyrood', label: 'Holyrood', sheet: 'Scottish', defaultParties: [
+      { name: 'Reform UK',    gains: 0, losses: 0 },
+      { name: 'Green',        gains: 0, losses: 0 },
+      { name: 'Labour',       gains: 0, losses: 0 },
+      { name: 'Conservative', gains: 0, losses: 0 },
+      { name: 'SNP',          gains: 0, losses: 0 },
+      { name: 'LibDems',      gains: 0, losses: 0 },
+  ]},
+  { key: 'senedd', label: 'Senedd Cymru', sheet: 'Senedd', defaultParties: [
+      { name: 'Reform UK',    gains: 0, losses: 0 },
+      { name: 'Green',        gains: 0, losses: 0 },
+      { name: 'Labour',       gains: 0, losses: 0 },
+      { name: 'Conservative', gains: 0, losses: 0 },
+      { name: 'Plaid Cymru',  gains: 0, losses: 0 },
+      { name: 'LibDems',      gains: 0, losses: 0 },
+  ]},
+  { key: 'mayoral', label: 'Mayorals (ENG)', sheet: 'Mayoral', defaultParties: [] },
+];
+
+var PARTY_COLORS = {
+  'reform': '#12B6CF', 'reform uk': '#12B6CF',
+  'labour': '#E4003B',
+  'conservative': '#003087', 'tory': '#003087',
+  'lib dem': '#FAA61A', 'lib dems': '#FAA61A', 'libdems': '#FAA61A', 'libdem': '#FAA61A', 'liberal democrat': '#FAA61A', 'liberal democrats': '#FAA61A',
+  'green': '#00B140',
+  'snp': '#FFDD00', 'scottish national': '#FFDD00',
+  'plaid': '#3F8428', 'plaid cymru': '#3F8428',
+  'other': '#6B7280', 'independent': '#6B7280',
+};
+
+var PARTY_ORDER = ['reform', 'green', 'labour', 'conservative', 'tory', 'libdems', 'libdem', 'lib dem', 'liberal democrat', 'snp', 'scottish national', 'plaid'];
+var PARTY_LAST  = ['other', 'independent'];
+
+function normalisePartyName(name) {
+  var n = (name || '').toLowerCase().trim();
+  if (n === 'lib dem' || n === 'lib dems' || n === 'libdem' || n === 'libdems' || n === 'liberal democrat' || n === 'liberal democrats') return 'LibDems';
+  return name;
+}
+
+function partyPriority(name) {
+  var n = (name || '').toLowerCase();
+  for (var i = 0; i < PARTY_LAST.length; i++) { if (n.indexOf(PARTY_LAST[i]) !== -1) return 9999; }
+  for (var i = 0; i < PARTY_ORDER.length; i++) { if (n.indexOf(PARTY_ORDER[i]) !== -1) return i; }
+  return PARTY_ORDER.length;
+}
+
+function partyColor(name) {
+  if (!name) return '#6B7280';
+  var n = name.toLowerCase().trim();
+  for (var k in PARTY_COLORS) { if (n.indexOf(k) !== -1) return PARTY_COLORS[k]; }
+  return '#6B7280';
+}
+
+function csvUrl(sheetName) {
+  return 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:csv&sheet=' + encodeURIComponent(sheetName);
+}
+
+function parseCSV(text) {
+  return text.split('\n').map(function(row) {
+    var result = [], cur = '', inQ = false;
+    for (var i = 0; i < row.length; i++) {
+      var ch = row[i];
+      if (ch === '"') { inQ = !inQ; }
+      else if (ch === ',' && !inQ) { result.push(cur.trim()); cur = ''; }
+      else { cur += ch; }
+    }
+    result.push(cur.trim());
+    return result;
+  }).filter(function(r) { return r.some(function(c) { return c !== ''; }); });
+}
+
+function parseSheet(csvText) {
+  var rows = parseCSV(csvText);
+  var data = { totalSeats: 0, declared: 0, parties: [] };
+  var section = 'meta';
+  for (var i = 0; i < rows.length; i++) {
+    var row = rows[i];
+    var key = (row[0] || '').trim().toLowerCase();
+    if (!key) continue;
+    if (key === 'total_seats') { data.totalSeats = parseInt(row[1]) || 0; continue; }
+    if (key === 'declared')    { data.declared   = parseInt(row[1]) || 0; continue; }
+    if (key === 'party')       { section = 'parties'; continue; }
+    if (key === 'area')        { section = 'results';  continue; }
+    if (section === 'parties') {
+      data.parties.push({
+        name: normalisePartyName(row[0] || ''),
+        gains: parseInt(row[1]) || 0,
+        losses: parseInt(row[2]) || 0
+      });
+    }
+  }
+  return data;
+}
+
+function mergeParties(sheetParties, defaults) {
+  var result = sheetParties.slice();
+  defaults.forEach(function(def) {
+    var normDef = normalisePartyName(def.name).toLowerCase().trim();
+    var already = result.some(function(p) {
+      return normalisePartyName(p.name).toLowerCase().trim() === normDef;
+    });
+    if (!already) result.push({ name: normalisePartyName(def.name), gains: def.gains, losses: def.losses });
+  });
+  return result;
+}
+
+async function fetchSheet(sheetName) {
+  var resp = await fetch(csvUrl(sheetName));
+  if (!resp.ok) throw new Error('HTTP ' + resp.status);
+  return parseSheet(await resp.text());
+}
+
+function pctStr(declared, total) { if (!total) return '0'; return Math.round((declared / total) * 100); }
+function badgeClass(n) { return n > 0 ? 'er-badge-gain' : n < 0 ? 'er-badge-loss' : 'er-badge-zero'; }
+
+function renderPanel(data) {
+  var pct = pctStr(data.declared, data.totalSeats);
+  var sorted = data.parties.slice().sort(function(a, b) { return partyPriority(a.name) - partyPriority(b.name); });
+
+  var partiesHtml = sorted.map(function(p) {
+    var col = partyColor(p.name);
+    var gc = badgeClass(p.gains);
+    var lc = badgeClass(-p.losses);
+    var gainStr = p.gains > 0 ? '+' + p.gains : p.gains === 0 ? '0' : '' + p.gains;
+    var lossStr = p.losses > 0 ? '−' + p.losses : '0';
+    return '<div class="er-party-card" style="border-left-color:' + col + '"><div class="er-party-name">' + p.name + '</div><div class="er-party-row"><span class="er-badge ' + gc + '">' + gainStr + '</span><span class="er-badge ' + lc + '">' + lossStr + '</span></div></div>';
+  }).join('');
+
+  return '<div class="er-progress-box"><div class="er-progress-row"><span class="er-progress-label">Seats Declared</span><div class="er-progress-pct-wrap"><div class="er-progress-pct">' + pct + '%</div><div class="er-progress-sub">' + data.declared + ' of ' + data.totalSeats + ' seats</div></div></div><div class="er-progress-track"><div class="er-progress-fill" style="width:' + pct + '%"></div></div></div><div class="er-section-label">Party Gains &amp; Losses</div><div class="er-parties-grid">' + (partiesHtml || '<div style="color:#8a9ab0;font-size:0.9rem">No party data yet</div>') + '</div>';
+}
+
+var activeKey = ELECTIONS[0].key;
+var cache = {};
+
+function buildUI() {
+  var nav = document.getElementById('erTabsNav');
+  var panels = document.getElementById('erPanels');
+  nav.innerHTML = ELECTIONS.map(function(e) {
+    return '<button class="er-tab-btn' + (e.key === activeKey ? ' er-active' : '') + '" data-key="' + e.key + '">' + e.label + '</button>';
+  }).join('');
+  panels.innerHTML = ELECTIONS.map(function(e) {
+    return '<div class="er-panel' + (e.key === activeKey ? ' er-active' : '') + '" id="erPanel-' + e.key + '"><div class="er-loading">Loading…</div></div>';
+  }).join('');
+  nav.addEventListener('click', function(e) {
+    var btn = e.target.closest('[data-key]');
+    if (!btn) return;
+    switchTab(btn.dataset.key);
+  });
+}
+
+function switchTab(key) {
+  activeKey = key;
+  document.querySelectorAll('.er-tab-btn').forEach(function(b) { b.classList.toggle('er-active', b.dataset.key === key); });
+  document.querySelectorAll('.er-panel').forEach(function(p) { p.classList.toggle('er-active', p.id === 'erPanel-' + key); });
+  try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch(e) {}
+  if (!cache[key]) {
+    var el = ELECTIONS.find(function(e) { return e.key === key; });
+    if (el) loadElection(el);
+  }
+}
+
+async function loadElection(el) {
+  var panel = document.getElementById('erPanel-' + el.key);
+  if (!panel) return;
+  panel.innerHTML = '<div class="er-loading">Loading results…</div>';
+  try {
+    var data = await fetchSheet(el.sheet);
+    data.parties = mergeParties(data.parties, el.defaultParties || []);
+    cache[el.key] = data;
+    panel.innerHTML = renderPanel(data);
+  } catch(err) {
+    panel.innerHTML = '<div class="er-error">Could not load data — check your Sheet ID and that the sheet is public.<br><small style="opacity:.6">' + err.message + '</small></div>';
+  }
+}
+
+async function refreshAll() {
+  cache = {};
+  for (var i = 0; i < ELECTIONS.length; i++) { await loadElection(ELECTIONS[i]); }
+  var now = new Date();
+  document.getElementById('erLastUpdated').textContent = 'Updated ' + now.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
+}
+
+buildUI();
+refreshAll();
+setInterval(refreshAll, 60000);
+</script>
