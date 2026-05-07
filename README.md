@@ -1,4 +1,3 @@
-[elections-widget (1).html](https://github.com/user-attachments/files/27486238/elections-widget.1.html)
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
