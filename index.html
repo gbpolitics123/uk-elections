@@ -120,11 +120,11 @@ var PARTY_COLORS = {
   'green': '#00B140',
   'snp': '#FFDD00', 'scottish national': '#FFDD00',
   'plaid': '#3F8428', 'plaid cymru': '#3F8428',
-  'other': '#6B7280', 'independent': '#6B7280',
+'independent': '#6B7280',
 };
 
 var PARTY_ORDER = ['reform', 'green', 'labour', 'conservative', 'tory', 'libdems', 'libdem', 'lib dem', 'liberal democrat', 'snp', 'scottish national', 'plaid'];
-var PARTY_LAST  = ['other', 'independent'];
+var PARTY_LAST  = ['independent'];
 
 function normalisePartyName(name) {
   var n = (name || '').toLowerCase().trim();
@@ -134,7 +134,7 @@ function normalisePartyName(name) {
 
 function partyPriority(name) {
   var n = (name || '').toLowerCase();
-  for (var i = 0; i < PARTY_LAST.length; i++) { if (n.indexOf(PARTY_LAST[i]) !== -1) return 9999; }
+  if (n.indexOf(PARTY_LAST[i]) !== -1) return 9999; }
   for (var i = 0; i < PARTY_ORDER.length; i++) { if (n.indexOf(PARTY_ORDER[i]) !== -1) return i; }
   return PARTY_ORDER.length;
 }
